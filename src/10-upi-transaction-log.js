@@ -47,5 +47,84 @@
  *   //      frequentContact: "Swiggy", allAbove100: false, hasLargeTransaction: true }
  */
 export function analyzeUPITransactions(transactions) {
-  // Your code here
+  if (!Array.isArray(transactions) || transactions.length === 0) return null;
+
+  // Step 1: Filter valid transactions
+  const validTransactions = transactions.filter(tx =>
+    Number.isFinite(tx.amount) &&
+    tx.amount > 0 &&
+    typeof tx.type === "string" &&
+    ["credit", "debit"].includes(tx.type.toLowerCase())
+  );
+
+  if (validTransactions.length === 0) return null;
+
+  const transactionCount = validTransactions.length;
+
+  // Step 2: Totals
+  const totalCredit = validTransactions
+    .filter(tx => tx.type.toLowerCase() === "credit")
+    .reduce((sum, tx) => sum + tx.amount, 0);
+
+  const totalDebit = validTransactions
+    .filter(tx => tx.type.toLowerCase() === "debit")
+    .reduce((sum, tx) => sum + tx.amount, 0);
+
+  const netBalance = totalCredit - totalDebit;
+
+  // Step 3: Average
+  const totalAmount = validTransactions.reduce(
+    (sum, tx) => sum + tx.amount,
+    0
+  );
+
+  const avgTransaction = Math.round(totalAmount / transactionCount);
+
+  // Step 4: Highest transaction
+  const highestTransaction = validTransactions.reduce(
+    (max, tx) => (tx.amount > max.amount ? tx : max),
+    validTransactions[0]
+  );
+
+  // Step 5: Category breakdown
+  const categoryBreakdown = validTransactions.reduce((acc, tx) => {
+    acc[tx.category] = (acc[tx.category] || 0) + tx.amount;
+    return acc;
+  }, {});
+
+  // Step 6: Frequent contact
+  const contactCount = validTransactions.reduce((acc, tx) => {
+    acc[tx.to] = (acc[tx.to] || 0) + 1;
+    return acc;
+  }, {});
+
+  let frequentContact = null;
+  let maxCount = 0;
+
+  for (const [name, count] of Object.entries(contactCount)) {
+    if (count > maxCount) {
+      maxCount = count;
+      frequentContact = name;
+    }
+  }
+
+  // Step 7: Boolean checks
+  const allAbove100 = validTransactions.every(tx => tx.amount > 100);
+
+  const hasLargeTransaction = validTransactions.some(
+    tx => tx.amount >= 5000
+  );
+
+  return {
+    totalCredit,
+    totalDebit,
+    netBalance,
+    transactionCount,
+    avgTransaction,
+    highestTransaction,
+    categoryBreakdown,
+    frequentContact,
+    allAbove100,
+    hasLargeTransaction
+  };
 }

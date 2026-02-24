@@ -41,6 +41,30 @@
  *   generateLocalPass(null)
  *   // => "INVALID PASS"
  */
+
 export function generateLocalPass(passenger) {
   // Your code here
+  if (typeof passenger !== "object" || passenger === null) return "INVALID PASS";
+  if (!passenger.name || !passenger.from || !passenger.to || !passenger.classType) return "INVALID PASS";
+
+  let classType = passenger.classType.toLowerCase();
+
+  // if (type !== "first" && type !== "second") return "INVALID PASS"; This logic also work
+  if (!["first", "second"].includes(classType)) return "INVALID PASS"; //I think this is best
+
+  //passenger name
+  const passName = passenger.name.trim().toUpperCase();
+  //coming from 
+  let from = passenger.from.trim().toLowerCase();
+  const whereFrom = from.charAt(0).toUpperCase() + from.slice(1);
+  //going to 
+  let to = passenger.to.trim().toLowerCase();
+  const goingTo = to.charAt(0).toUpperCase() + to.slice(1);
+  //class type
+  const capClassType = classType.toUpperCase();
+
+  //pass ID
+  const passId = capClassType.charAt(0) + whereFrom.slice(0, 3).toUpperCase() + goingTo.slice(0, 3).toUpperCase();
+
+  return `MUMBAI LOCAL PASS\n---\nName: ${passName}\nFrom: ${whereFrom}\nTo: ${goingTo}\nClass: ${capClassType}\nPass ID: ${passId}`
 }

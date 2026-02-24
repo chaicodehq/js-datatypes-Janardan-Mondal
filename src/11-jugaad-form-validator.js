@@ -63,4 +63,17 @@
  */
 export function validateForm(formData) {
   // Your code here
+  let errors = {};
+  const name = formData.name?.trim() || ""
+
+  if (typeof name !== "string" || name === "" || name.length < 2 || name.length > 50) {
+    errors.name = "Name must be 2-50 characters";
+  }
+
+
+  const isValid = Object.keys(errors).length === 0;
+  return {
+    isValid,
+    errors
+  }
 }
